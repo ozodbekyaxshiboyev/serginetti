@@ -51,7 +51,7 @@ class LoginSerializer(serializers.Serializer):
         print(1111, user)
         if not user:
             raise AuthenticationFailed({
-                'message': 'Email or password is not correct'
+                'message': 'Fullname or password is not correct'
             })
         if not user.is_active:
             raise AuthenticationFailed({
@@ -68,7 +68,7 @@ class LoginSerializer(serializers.Serializer):
         return attrs
 
     @classmethod
-    def  get_token(cls, user):
+    def get_token(cls, user):
         return cls.token_class.for_user(user)
 
 
