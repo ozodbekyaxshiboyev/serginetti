@@ -48,6 +48,15 @@ class LoginSerializer(serializers.Serializer):
             pass
 
         user = authenticate(**authenticate_kwargs)
+        print(1111, user)
+        if not user:
+            raise AuthenticationFailed({
+                'message': 'Email or password is not correct'
+            })
+        if not user.is_active:
+            raise AuthenticationFailed({
+                'message': 'Account is not active'
+            })
         refresh = self.get_token(user)
 
         attrs["refresh"] = str(refresh)
