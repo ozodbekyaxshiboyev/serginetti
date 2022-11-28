@@ -117,37 +117,26 @@ class UserListView(generics.ListAPIView):
         return Response({'users': serializer.data}, status=status.HTTP_200_OK)
 
 
-class UserOwnView(generics.RetrieveAPIView):
-    permission_classes = (IsOwnUserOrReadOnly, IsAuthenticated,)
-    serializer_class = UserDetailSerializer
-
-    def queryset(self, request, *args, **kwargs):
-        user = request.user
-        query = User.objects.get(id=user.id)
-        serializer = self.get_serializer(query)
-        return Response({'success': True, 'data': serializer.data}, status=status.HTTP_200_OK)
-
-class UserDetailView(generics.RetrieveUpdateAPIView):
+class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = UserDetailSerializer
     queryset = User.objects.all()
-    permission_classes = (IsOwnUserOrReadOnly, IsAuthenticated)
+    # permission_classes = (IsOwnUserOrReadOnly, IsAuthenticated)
 
-    def get(self, request, *args, **kwargs):
-        query = self.get_object()
-        if query:
-            serializer = self.get_serializer(query)
-            return Response({'success': True, 'data': serializer.data}, status=status.HTTP_200_OK)
-        else:
-            return Response({'success': False, 'message': 'query did not exist'}, status=status.HTTP_404_NOT_FOUND)
-
-    def put(self, request, *args, **kwargs):
-        obj = self.get_object()
-        serializer = self.get_serializer(obj, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response({'success': True, 'data': serializer.data}, status=status.HTTP_202_ACCEPTED)
-        return Response({'success': False, 'message': 'credentials is invalid'}, status=status.HTTP_404_NOT_FOUND)
-
+    # def get(self, request, *args, **kwargs):
+    #     query = self.get_object()
+    #     if query:
+    #         serializer = self.get_serializer(query)
+    #         return Response({'success': True, 'data': serializer.data}, status=status.HTTP_200_OK)
+    #     else:
+    #         return Response({'success': False, 'message': 'query did not exist'}, status=status.HTTP_404_NOT_FOUND)
+    #
+    # def patch(self, request, *args, **kwargs):
+    #     obj = self.get_object()
+    #     serializer = self.get_serializer(obj, data=request.data)
+    #     if serializer.is_valid():
+    #         serializer.save()
+    #         return Response({'success': True, 'data': serializer.data}, status=status.HTTP_202_ACCEPTED)
+    #     return Response({'success': False, 'message': 'credentials is invalid'}, status=status.HTTP_404_NOT_FOUND)
 
 
 class ChangePasswordView(generics.UpdateAPIView):
