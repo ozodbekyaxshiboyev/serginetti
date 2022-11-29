@@ -1,3 +1,6 @@
 from django.contrib import admin
+from .models import Order, OrderItem, OrderItemSize, \
+    Wishlist, WishlistSize
 
-# Register your models here.
+
+admin.site.register((Order, OrderItem, OrderItemSize, Wishlist, WishlistSize,))

@@ -1,5 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import Sum
 from django.utils.text import slugify
 from django.core.validators import MinValueValidator, MaxValueValidator
 
@@ -113,15 +114,6 @@ class Product(Basemodel):
 
 
     # @property
-    # def is_in_discount(self):
-    #     active_discounts = 1
-    #     pass
-    #
-    # @property
-    # def which_discount(self):
-    #     pass
-
-    # @property
     # def discount_amount(self):
     #     if self.in_discount:
     #         return self.discount.percentage
@@ -158,6 +150,17 @@ class ProductMade(Basemodel):
     product = models.ForeignKey(Product, on_delete=models.CASCADE,related_name='productmade')
     made = models.ForeignKey(MadeType, on_delete=models.CASCADE,related_name='productmade')
     amount = models.FloatField(validators=[MinValueValidator(0)])
+
+    def clean(self):
+        if self.id:
+            instance = ProductMade.objects.get(id=self.id)
+            sum_amount = ProductMade.objects.all().aggregate(Sum('amount')).get('amount__sum')
+            if sum_amount - instance.amount + self.amount > 100:
+                raise ValidationError('Mahsulot tarkibi 100 foizdan oshmasligi kerak')
+        else:
+            sum_amount = ProductMade.objects.all().aggregate(Sum('amount')).get('amount__sum')
+            if sum_amount + self.amount > 100:
+                raise ValidationError('Mahsulot tarkibi 100 foizdan oshmasligi kerak')
 
 
 class ProductImage(Basemodel):
