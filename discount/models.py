@@ -25,6 +25,8 @@ class DiscountItem(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True, blank=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True, blank=True)
     is_active = models.BooleanField(default=True)
+    created_date = models.DateTimeField(auto_now_add=True)
+
 
     def __str__(self):
         return str(self.type)

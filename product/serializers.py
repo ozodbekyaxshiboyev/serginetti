@@ -149,6 +149,7 @@ class ProductListSerializer(serializers.ModelSerializer):
         representation['product_images'] = image_serializer.data
         representation['product_mades'] = made_serializer.data
         discount = has_discount(instance)
+        print(111, discount)
         if discount:
             representation['has_discount'] = True
             representation['discount_amount'] = discount.percentage
@@ -169,8 +170,6 @@ class ProductListSerializer(serializers.ModelSerializer):
             'capsule',
             'category',
             'color',
-            'in_discount',
-            'discount_amount',
 
         )
 
@@ -212,8 +211,6 @@ class ProductDetailSerializer(serializers.ModelSerializer):
             'is_new',
             'is_cheap',
             'is_xit',
-            'in_discount',
-            'discount_amount',
             'is_active',
             'created_at',
             'updated_at',
