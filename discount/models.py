@@ -9,10 +9,14 @@ from product.models import Product, Category
 class Discount(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True, null=True)
-    percentage = models.PositiveIntegerField(default=10, validators=[MaxValueValidator(100)])
+    percentage = models.PositiveIntegerField(validators=[MaxValueValidator(100)])
     from_date = models.DateField(auto_now=True)
     to_date = models.DateField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
+    created_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
 
 
 class DiscountItem(models.Model):
@@ -20,6 +24,11 @@ class DiscountItem(models.Model):
     type = models.CharField(max_length=20, choices=DiscountType.choices())
     category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True, blank=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True, blank=True)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return str(self.type)
+
 
     def clean(self):
         if self.type == DiscountType.all.value and (self.category or self.product):

@@ -2,6 +2,8 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from django.db.models import Sum
 
+from discount.services import has_discount
+
 from .models import (
     Category, Color,
     Capsule,Size,
@@ -142,13 +144,17 @@ class ProductListSerializer(serializers.ModelSerializer):
         representation = super().to_representation(instance)
         product_images = instance.productimage.all()
         image_serializer = ProductImageSerializer(product_images, many=True)
-        # product_sizes = instance.productsize.all()
-        # size_serializer = ProductSizeForDetailSerializer(product_sizes, many=True)
         product_mades = instance.productmade.all()
         made_serializer = ProductMadeForOrderWishlistSerializer(product_mades, many=True)
         representation['product_images'] = image_serializer.data
-        # representation['product_sizes'] = size_serializer.data
         representation['product_mades'] = made_serializer.data
+        discount = has_discount(instance)
+        if discount:
+            representation['has_discount'] = True
+            representation['discount_amount'] = discount.percentage
+        else:
+            representation['has_discount'] = False
+
         return representation
 
     class Meta:

@@ -4,7 +4,6 @@ from django.utils.text import slugify
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 from account.models import Client
-# from discount.models import Discount
 from product.enums import SellType
 
 
@@ -113,28 +112,28 @@ class Product(Basemodel):
     # discount = models.ForeignKey(Discount, on_delete=models.SET_NULL, null=True, blank=True)
 
 
-    @property
-    def is_in_discount(self):
-        # active_discounts =
-        pass
+    # @property
+    # def is_in_discount(self):
+    #     active_discounts = 1
+    #     pass
+    #
+    # @property
+    # def which_discount(self):
+    #     pass
 
-    @property
-    def which_discount(self):
-        pass
-
-    @property
-    def discount_amount(self):
-        if self.in_discount:
-            return self.discount.percentage
-        return 0
-
-    @property
-    def get_sell_price(self):
-        discount = self.discount_amount
-        if discount > 0:
-            return self.price * (100 - self.discount_amount)
-        else:
-            return self.price
+    # @property
+    # def discount_amount(self):
+    #     if self.in_discount:
+    #         return self.discount.percentage
+    #     return 0
+    #
+    # @property
+    # def get_sell_price(self):
+    #     discount = self.discount_amount
+    #     if discount > 0:
+    #         return self.price * (100 - self.discount_amount)
+    #     else:
+    #         return self.price
 
     def save(self, *args, **kwargs):
         if not self.slug:
