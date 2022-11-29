@@ -4,7 +4,7 @@ from django.utils.text import slugify
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 from account.models import Client
-from discount.models import Discount
+# from discount.models import Discount
 from product.enums import SellType
 
 
@@ -109,12 +109,13 @@ class Product(Basemodel):
     sizes = models.ManyToManyField(Size, through='ProductSize', related_name='product')
 
     is_active = models.BooleanField(default=True)
-    in_discount = models.BooleanField(default=False)
-    discount = models.ForeignKey(Discount, on_delete=models.SET_NULL, null=True, blank=True)
+    # in_discount = models.BooleanField(default=False)
+    # discount = models.ForeignKey(Discount, on_delete=models.SET_NULL, null=True, blank=True)
 
 
     @property
     def is_in_discount(self):
+        # active_discounts =
         pass
 
     @property
