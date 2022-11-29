@@ -99,13 +99,18 @@ class ProductSizeForDetailSerializer(serializers.ModelSerializer):
 class ProductMadeSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
-        sum_amount = self.Meta.model.objects.all().aggregate(Sum('amount')).get('amount__sum')
+        product = Product.objects.get(id=validated_data.get('product'))
+        sum_amount = self.Meta.model.objects.filter(product=product).aggregate(Sum('amount')).get('amount__sum')
+        if sum_amount is None:
+            sum_amount = 0
         if sum_amount + validated_data.get('amount') > 100:
             raise serializers.ValidationError('Mahsulot tarkibi 100 foizdan oshmasligi kerak')
         return self.Meta.model.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
-        sum_amount = self.Meta.model.objects.all().aggregate(Sum('amount')).get('amount__sum')
+        sum_amount = self.Meta.model.objects.filter(product=instance.product).aggregate(Sum('amount')).get('amount__sum')
+        if sum_amount is None:
+            sum_amount = 0
         if sum_amount - instance.amount + validated_data.get('amount') > 100:
             raise serializers.ValidationError('Mahsulot tarkibi 100 foizdan oshmasligi kerak')
         instance.save()

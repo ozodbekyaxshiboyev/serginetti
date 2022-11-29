@@ -29,15 +29,15 @@ class DiscountItem(models.Model):
 
 
     def __str__(self):
-        return str(self.type)
+        return str(self.discount.name)
 
 
     def clean(self):
         if self.type == DiscountType.all.value and (self.category or self.product):
             raise ValidationError("Hamma tovar tanlanganda alohida kategory yoki tovar tanlash mumkin emas!")
 
-        if self.type == DiscountType.category.value and self.product:
+        if self.type == DiscountType.category.value and self.product or (self.type == DiscountType.category.value and self.category is None):
             raise ValidationError("Kategoryni kiriting product emas!")
 
-        if self.type == DiscountType.product.value and self.category:
+        if self.type == DiscountType.product.value and self.category or (self.type == DiscountType.product.value and  self.product is None):
             raise ValidationError("Product kiriting kategory emas!")

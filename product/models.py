@@ -154,11 +154,15 @@ class ProductMade(Basemodel):
     def clean(self):
         if self.id:
             instance = ProductMade.objects.get(id=self.id)
-            sum_amount = ProductMade.objects.all().aggregate(Sum('amount')).get('amount__sum')
+            sum_amount = ProductMade.objects.filter(product=instance.product).aggregate(Sum('amount')).get('amount__sum')
+            if sum_amount is None:
+                sum_amount = 0
             if sum_amount - instance.amount + self.amount > 100:
                 raise ValidationError('Mahsulot tarkibi 100 foizdan oshmasligi kerak')
         else:
-            sum_amount = ProductMade.objects.all().aggregate(Sum('amount')).get('amount__sum')
+            sum_amount = ProductMade.objects.filter(product=self.product).aggregate(Sum('amount')).get('amount__sum')
+            if sum_amount is None:
+                sum_amount = 0
             if sum_amount + self.amount > 100:
                 raise ValidationError('Mahsulot tarkibi 100 foizdan oshmasligi kerak')
 
