@@ -18,9 +18,8 @@ from .serializers import (
 class WishlistViewset(viewsets.ModelViewSet):
     queryset = Wishlist.objects.all()
     serializer_class = WishlistSerializer
-    permission_classes = [permissions.IsAuthenticated,IsClient]
-    http_method_names = ['post','get','delete']
-
+    permission_classes = [permissions.IsAuthenticated, IsClient]
+    http_method_names = ['post', 'get', 'delete']
 
     def get_serializer_class(self):
         serializer_dict = {
@@ -30,13 +29,14 @@ class WishlistViewset(viewsets.ModelViewSet):
         }
         return serializer_dict.get(self.action, self.serializer_class)
 
-    #For update wishlist
+    # For update wishlist
     @action(detail=True, methods=['post'], url_path='updatewishlist')
     def updatewishlist(self, request, *args, **kwargs):
         wishlist_sizes = request.data.get('sizes')
         data = request.data
         wishlist = self.get_object()
-        serializer = WishlistCheckSerializer(instance=wishlist,data=data, context={'wishlist_sizes': wishlist_sizes,'wishlist':wishlist.id})
+        serializer = WishlistCheckSerializer(instance=wishlist, data=data,
+                                             context={'wishlist_sizes': wishlist_sizes, 'wishlist': wishlist.id})
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -53,8 +53,7 @@ class WishlistViewset(viewsets.ModelViewSet):
         else:
             return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-    #todo shu kabi junatiladi ikkalasiga ham
+    # todo shu kabi junatiladi ikkalasiga ham
     # {
     #     "product": 1,
     #     "price": 6000,
@@ -73,30 +72,31 @@ class WishlistViewset(viewsets.ModelViewSet):
 class OrderViewset(viewsets.ModelViewSet):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
-    permission_classes = [permissions.IsAuthenticated,IsClient]
-    http_method_names = ['post','get','delete']
+    permission_classes = [permissions.IsAuthenticated, IsClient]
+    http_method_names = ['post', 'get', 'delete']
 
-
-    #For update order
+    # For update order
     @action(detail=True, methods=['post'], url_path='updateorder')
     def updateorder(self, request, *args, **kwargs):
         wishlist_sizes = request.data.get('sizes')
         data = request.data
         wishlist = self.get_object()
-        serializer = WishlistCheckSerializer(instance=wishlist,data=data, context={'wishlist_sizes': wishlist_sizes,'wishlist':wishlist.id})
+        serializer = WishlistCheckSerializer(instance=wishlist, data=data,
+                                             context={'wishlist_sizes': wishlist_sizes, 'wishlist': wishlist.id})
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     # For change status order
-    @action(detail=True, methods=['post'], url_path='changestatus',permission_classes=[IsNotClient, permissions.IsAuthenticated])
+    @action(detail=True, methods=['post'], url_path='changestatus',
+            permission_classes=[IsNotClient, permissions.IsAuthenticated])
     def changestatus(self, request, *args, **kwargs):
         order = self.get_object()
         status = self.request.data.get('status')
 
         if status not in [i[0] for i in list(OrderStatus.choices())]:
-            return Response({"Xatolik!":"Status xato kiritildi"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"Xatolik!": "Status xato kiritildi"}, status=status.HTTP_400_BAD_REQUEST)
 
         order.status = status
         order.save()
@@ -114,7 +114,6 @@ class OrderViewset(viewsets.ModelViewSet):
         else:
             return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
     def get_serializer_class(self):
         serializer_dict = {
             'list': OrderMySerializer,
@@ -124,7 +123,7 @@ class OrderViewset(viewsets.ModelViewSet):
         }
         return serializer_dict.get(self.action, self.serializer_class)
 
-    #todo shu holatda junatiladi
+    # todo shu holatda junatiladi
     # {
     #     "products": [
     #         {"product": 1,

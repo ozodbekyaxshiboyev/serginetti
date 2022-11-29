@@ -112,11 +112,28 @@ class Product(Basemodel):
     in_discount = models.BooleanField(default=False)
     discount = models.ForeignKey(Discount, on_delete=models.SET_NULL, null=True, blank=True)
 
+
+    @property
+    def is_in_discount(self):
+        pass
+
+    @property
+    def which_discount(self):
+        pass
+
     @property
     def discount_amount(self):
         if self.in_discount:
             return self.discount.percentage
         return 0
+
+    @property
+    def get_sell_price(self):
+        discount = self.discount_amount
+        if discount > 0:
+            return self.price * (100 - self.discount_amount)
+        else:
+            return self.price
 
     def save(self, *args, **kwargs):
         if not self.slug:

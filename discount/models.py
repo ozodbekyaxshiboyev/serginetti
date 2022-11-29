@@ -1,9 +1,32 @@
+from django.core.exceptions import ValidationError
+from django.core.validators import MaxValueValidator
 from django.db import models
+
+from product.enums import DiscountType
+from product.models import Product, Category
 
 
 class Discount(models.Model):
     name = models.CharField(max_length=100)
-    percentage = models.PositiveIntegerField(default=10)
-    from_date = models.DateField()
-    to_date = models.DateField()
+    description = models.TextField(blank=True, null=True)
+    percentage = models.PositiveIntegerField(default=10, validators=[MaxValueValidator(100)])
+    from_date = models.DateField(auto_now=True)
+    to_date = models.DateField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
+
+
+class DiscountItem(models.Model):
+    discount = models.ForeignKey(Discount, on_delete=models.CASCADE)
+    type = models.CharField(max_length=20, choices=DiscountType.choices())
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True, blank=True)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True, blank=True)
+
+    def clean(self):
+        if self.type == DiscountType.all.value and (self.category or self.product):
+            raise ValidationError("Hamma tovar tanlanganda alohida kategory yoki tovar tanlash mumkin emas!")
+
+        if self.type == DiscountType.category.value and self.product:
+            raise ValidationError("Kategoryni kiriting product emas!")
+
+        if self.type == DiscountType.product.value and self.category:
+            raise ValidationError("Product kiriting kategory emas!")

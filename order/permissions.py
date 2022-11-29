@@ -2,7 +2,7 @@ from rest_framework import permissions
 from account.enums import UserRoles
 
 
-class IsNotClient(permissions.IsAuthenticated):
+class IsNotClient(permissions.BasePermission):
     """
     Allows access only to authenticated users.
     """
@@ -11,7 +11,7 @@ class IsNotClient(permissions.IsAuthenticated):
         return request.user.role is not UserRoles.client.value
 
 
-class IsClient(permissions.IsAuthenticated):
+class IsClient(permissions.BasePermission):
     """
     Allows access only to authenticated users.
     """
