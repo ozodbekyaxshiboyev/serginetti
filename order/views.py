@@ -18,7 +18,7 @@ from .serializers import (
 class WishlistViewset(viewsets.ModelViewSet):
     queryset = Wishlist.objects.all()
     serializer_class = WishlistSerializer
-    permission_classes = [permissions.IsAuthenticated, IsClient]
+    # permission_classes = [permissions.IsAuthenticated, IsClient]
     http_method_names = ['post', 'get', 'delete']
 
     def get_serializer_class(self):
@@ -45,7 +45,7 @@ class WishlistViewset(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         wishlist_sizes = request.data.get('sizes')
         data = request.data
-        data['client'] = self.request.user.id
+        # data['client'] = self.request.user.id
         serializer = self.serializer_class(data=data, context={'wishlist_sizes': wishlist_sizes})
         if serializer.is_valid():
             serializer.save()

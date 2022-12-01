@@ -2,7 +2,7 @@ from django.db.models import Sum
 from rest_framework import serializers
 from django.db import transaction
 from account.serializers import UserSerializer
-from product.models import ProductSize, Product
+from product.models import ProductSize, Product, Size
 from product.serializers import ProductForOrderWishlistSerializer
 from .models import (
     Order, OrderItem, OrderItemSize,
@@ -18,6 +18,11 @@ class WishlistSizeSerializer(serializers.ModelSerializer):
 
 
 class WishlistSizeCheckSerializer(serializers.ModelSerializer):
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['size'] = instance.productsize.size
+        return representation
+
     class Meta:
         model = WishlistSize
         fields = ('productsize','count',)
@@ -37,7 +42,7 @@ class WishlistSerializer(serializers.ModelSerializer):
         with transaction.atomic():
             wishlist = self.Meta.model.objects.create(**validated_data)
             for size in wishlist_sizes:
-                productsize = ProductSize.objects.get(id=size.get('productsize'))
+                productsize = Size.objects.get(id=size.get('productsize'))
                 WishlistSize.objects.create(wishlist=wishlist,
                                              productsize=productsize,
                                             count=size.get('count'))
@@ -60,8 +65,8 @@ class WishlistWatchSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         product_sizes = instance.wishlistsize.all()
-        image_serializer = WishlistSizeCheckSerializer(product_sizes, many=True)
-        representation['sizes'] = image_serializer.data
+        size_serializer = WishlistSizeCheckSerializer(product_sizes, many=True)
+        representation['sizes'] = size_serializer.data
         representation['total_count'] = instance.get_total_count
         representation['total_price'] = instance.get_total_price
         return representation
@@ -90,10 +95,11 @@ class WishlistCheckSerializer(serializers.ModelSerializer):
                 wishlistsize.delete()
 
             for size in wishlist_sizes:
-                productsize = ProductSize.objects.get(id=size.get('productsize'))
+                productsize = Size.objects.get(id=size.get('productsize'))
                 WishlistSize.objects.create(wishlist=wishlist,
                                              productsize=productsize,
                                             count=size.get('count'))
+
         return attrs
 
 
@@ -181,7 +187,7 @@ class OrderSerializer(serializers.ModelSerializer):
                                             price=size.get('price'))
                 sizes = size.get('sizes')
                 for sz in sizes:
-                    productsize = ProductSize.objects.get(id=sz.get('productsize'))
+                    productsize = Size.objects.get(id=sz.get('productsize'))
                     OrderItemSize.objects.create(orderitem=orderitem,
                                                 productsize=productsize,
                                                 count=sz.get('count'))
