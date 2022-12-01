@@ -4,6 +4,7 @@ from enum import Enum
 class UserRoles(Enum):
     director = 'director'
     vendor = 'vendor'
+    manager = 'manager'
     client = 'client'
 
     @classmethod

@@ -27,11 +27,6 @@ class DiscountItem(models.Model):
     is_active = models.BooleanField(default=True)
     created_date = models.DateTimeField(auto_now_add=True)
 
-
-    def __str__(self):
-        return str(self.discount.name)
-
-
     def clean(self):
         if self.type == DiscountType.all.value and (self.category or self.product):
             raise ValidationError("Hamma tovar tanlanganda alohida kategory yoki tovar tanlash mumkin emas!")
@@ -41,3 +36,6 @@ class DiscountItem(models.Model):
 
         if self.type == DiscountType.product.value and self.category or (self.type == DiscountType.product.value and  self.product is None):
             raise ValidationError("Product kiriting kategory emas!")
+
+    def __str__(self):
+        return str(self.discount.name)

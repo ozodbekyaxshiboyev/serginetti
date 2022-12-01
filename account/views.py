@@ -6,10 +6,11 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from .utils import Util
 from .models import User
 from .permissions import IsOwnUserOrReadOnly
 from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
+from django.core.mail import EmailMessage
+
 
 
 from .serializers import (
@@ -35,17 +36,12 @@ class RegisterView(generics.GenericAPIView):
         user = User.objects.get(email=user_data['email'])
         token = RefreshToken.for_user(user)
 
-        current_site = 'localhost:8000/'
-        relative_link = 'account/verify-email/'
-        abs_url = f'http://{current_site}{relative_link}?token={str(token.access_token)}'
-        email_body = f'Salom, {user.email} \n Serginetti sayti uchun akkountingizni faollashtirish uchun link \n {abs_url}'
-        data = {
-            'to_email': user.email,
-            'email_subject': 'Serginnetti sayti uchun emailigizni aktivlashtiring',
-            'email_body': email_body
-        }
-        Util.send_email(data)
+        url = f'http://127.0.0.1:8000/accounts/verify-email/?token={str(token.access_token)}'
+        body = f'Salom, {user.email} \n Serginetti sayti uchun akkountingizni faollashtirish uchun link \n {url}'
+        subject = 'Serginnetti sayti uchun emailigizni aktivlashtiring',
 
+        email = EmailMessage(to=user.email, subject=subject, body=body)
+        email.send()
         return Response({'success': True, 'message': 'Emailingizga akkountingizni faollashtirishga link yuborildi'},
                         status=status.HTTP_201_CREATED)
 
@@ -80,6 +76,7 @@ class LoginAPIView(generics.GenericAPIView):
     permission_classes = []
 
     def post(self, request, *args, **kwargs):
+        print(request.data)
         serializer = self.get_serializer(data=request.data)
         try:
             serializer.is_valid(raise_exception=True)
@@ -121,22 +118,6 @@ class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = UserDetailSerializer
     queryset = User.objects.all()
     # permission_classes = (IsOwnUserOrReadOnly, IsAuthenticated)
-
-    # def get(self, request, *args, **kwargs):
-    #     query = self.get_object()
-    #     if query:
-    #         serializer = self.get_serializer(query)
-    #         return Response({'success': True, 'data': serializer.data}, status=status.HTTP_200_OK)
-    #     else:
-    #         return Response({'success': False, 'message': 'query did not exist'}, status=status.HTTP_404_NOT_FOUND)
-    #
-    # def patch(self, request, *args, **kwargs):
-    #     obj = self.get_object()
-    #     serializer = self.get_serializer(obj, data=request.data)
-    #     if serializer.is_valid():
-    #         serializer.save()
-    #         return Response({'success': True, 'data': serializer.data}, status=status.HTTP_202_ACCEPTED)
-    #     return Response({'success': False, 'message': 'credentials is invalid'}, status=status.HTTP_404_NOT_FOUND)
 
 
 class ChangePasswordView(generics.UpdateAPIView):

@@ -78,4 +78,4 @@ class ClientManager(CustomUserManager):
 class StaffManager(CustomUserManager):
     def get_queryset(self):
         return super(StaffManager, self).get_queryset().filter(
-            role__in=(UserRoles.director.value, UserRoles.baker.value,UserRoles.vendor.value,))
+            role__in=(UserRoles.director.value, UserRoles.manager.value,UserRoles.vendor.value,))
